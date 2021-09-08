@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+  function ajax(res) {
+    //存储默认值
+    var defauls={
+      type:'get',
+      url:'',
+      data:{},
+      headers:{
+        'Content-Type': 'application/json'
+      },
+      success:function(){},
+      error:function(){}
+    }
+
+    //使用res对象中的属性覆盖defauls对象中的属性
+    Object.assign(defauls,res) //Object.assign (对象覆盖)
+
+    //创建ajax对象defauls
+    var xhr = new XMLHttpRequest()
+
+    //设置变量为空字符串
+    var params = ''
+
+    //遍历data中的对象数据并使用字符串形式拼接起来
+    for (let obj in defauls.data) {
+      params += obj + '=' + defauls.data[obj] + '&'
+    }
+    params = params.substr(0, params.length - 1)
+
+    //如果请求方式是get请求就执行
+    if (defauls.type == 'get') {
+      defauls.url = defauls.url + '?' + params
+    }
+    xhr.open(defauls.type, defauls.url)
+
+    //如果请求方式为post请求就进行执行Ajax的post请求的两种方式
+    if (defauls.type == 'post') {
+      var contentType = defauls.headers['Content-Type']
+
+      //判断数据格式是否为json数据类型，是则用send传给后端用JSON解析对象的字符串
+      if (contentType == 'application/json') {
+        xhr.send(JSON.stringify(defauls.data))
+
+      } else {    //如果数据格式为其他则用send穿给后端拼接好的字符串
+        xhr.setRequestHeader('Content-Type', defauls.headers['Content-Type'])
+        xhr.send(params)
+      }     
+    } else { //如果不是post请求，不用send传输后端数据
+      xhr.send()
+    };
+    xhr.onload = () => {
+      //获取后端返回前端的响应头信息的数据格式并赋值
+      var response=xhr.getResponseHeader('Content-Type')
+
+      //获取后端返回前端的数据并赋值
+      var responseText=xhr.responseText
+
+      //如果数据格式里包含application/json的字符串的数据格式则把字符串转为json对象
+      if(response.includes('application/json')){
+        responseText=JSON.parse(responseText)
+      }
+
+      //当HTTP状态码大于等于200小于300时或者超出，传参数据并输出
+      if(xhr.status>=200 && xhr.status<300){
+        
+        defauls.success(responseText,xhr);
+      }else{
+        defauls.error(responseText,xhr)
+      }
+      
+    }
+  }
+  ajax({
+
+    url: 'http://localhost:8899/user',
+    data: {
+      name: 'zhangsan',
+      uid: 38
+    },
+
+    success: function (data,xhr) {
+      console.log(data)
+      console.log('yoxi')
+      console.log(xhr)
+    }
+  })
+</script>
+
+</html>

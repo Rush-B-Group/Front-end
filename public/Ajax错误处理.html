@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <button id="bb">发送请求</button>
+</body>
+<script>
+  var bb = document.getElementById('bb')
+  bb.onclick = () => {
+    var xhr = new XMLHttpRequest();
+    xhr.open('get', 'http://localhost:8899/guier');
+    xhr.send();
+    xhr.onload = () => {
+      console.log(xhr.responseText)
+      if (xhr.status == 400) {
+        alert('nmsl')
+      }
+      
+    };
+    xhr.onerror=function(){
+        alert('你网线被我拔qdqw了');
+      }
+  }
+
+</script>
+
+</html>
